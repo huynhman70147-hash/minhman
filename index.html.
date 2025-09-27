@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anh xin lỗi em</title>
+  <style>
+    * {margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif;}
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+      text-align: center;
+    }
+    img {
+      max-width: 260px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    h1 {
+      color: #d35400;
+      margin-bottom: 10px;
+    }
+    p {
+      margin-bottom: 20px;
+      font-size: 1.1em;
+      color: #2c3e50;
+    }
+    .btn-group {
+      display: flex;
+      gap: 20px;
+      margin-top: 10px;
+    }
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-yes {
+      background: #e74c3c;
+      color: white;
+    }
+    .btn-no {
+      background: #bdc3c7;
+      color: #333;
+      position: relative;
+    }
+    #response {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #e74c3c;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Ảnh minh họa, thay bằng ảnh của bạn nếu muốn -->
+  <img src="https://i.imgur.com/k8Tw7GR.jpeg" alt="Xin lỗi">
+
+  <h1>Em à…</h1>
+  <p>Anh thật sự xin lỗi vì đã làm em buồn.<br>
+     Em có thể tha lỗi cho anh được không? 💖</p>
+
+  <div class="btn-group">
+    <button class="btn btn-yes" onclick="onYes()">Em tha lỗi</button>
+    <button id="btnNo" class="btn btn-no" onmouseover="moveButton()">Không</button>
+  </div>
+
+  <div id="response">💘 Cảm ơn em đã tha lỗi cho anh 💘</div>
+
+  <script>
+    function onYes() {
+      document.getElementById('response').style.display = 'block';
+    }
+    function moveButton() {
+      let btn = document.getElementById('btnNo');
+      let x = Math.random() * (window.innerWidth - btn.offsetWidth - 20);
+      let y = Math.random() * (window.innerHeight - btn.offsetHeight - 20);
+      btn.style.position = "fixed";
+      btn.style.left = `${x}px`;
+      btn.style.top = `${y}px`;
+    }
+  </script>
+</body>
+</html>
