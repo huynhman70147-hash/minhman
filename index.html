@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gửi người con gái anh yêu ❤️</title>
+    <!-- Tải Tailwind CSS để tạo kiểu dáng đẹp mắt -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Thiết lập font Inter */
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.5s ease;
+        }
+
+        /* Đảm bảo nội dung luôn ở giữa màn hình */
+        .full-screen-center {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            /* Thay đổi màu nền dịu dàng hơn, kết hợp xanh nhạt và hồng pastel */
+            background: linear-gradient(135deg, #FFD7E0 0%, #AEC6CF 100%); 
+        }
+        
+        /* Hiệu ứng cho nút YES */
+        .btn-yes {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        .btn-yes:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Hiệu ứng di chuyển và thay đổi kích thước cho nút NO */
+        .btn-no {
+            position: absolute;
+            transition: all 0.3s ease;
+            white-space: nowrap; /* Ngăn chữ bị ngắt dòng */
+        }
+        
+        /* Khung thông báo tùy chỉnh (thay thế alert) */
+        .custom-modal {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 50;
+        }
+        .modal-content {
+            animation: fadeInScale 0.3s ease-out;
+        }
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Modal tùy chỉnh cho thông báo -->
+    <div id="custom-modal" class="custom-modal fixed inset-0 hidden items-center justify-center p-4">
+        <div id="modal-content" class="modal-content bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center">
+            <h2 id="modal-title" class="text-2xl font-bold mb-4 text-red-500"></h2>
+            <p id="modal-message" class="text-gray-700 mb-6"></p>
+            <button onclick="closeModal()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
+                Đã hiểu
+            </button>
+        </div>
+    </div>
+    
+    <!-- Nội dung chính của trang web -->
+    <div class="full-screen-center">
+        <div id="content-card" class="bg-white p-8 md:p-12 rounded-2xl shadow-2xl text-center max-w-lg w-full transform transition duration-500 hover:scale-[1.01]">
+            <h1 class="text-4xl font-extrabold text-pink-600 mb-6 animate-pulse">
+                Anh xin lỗi, em có thể tha thứ cho anh không?
+            </h1>
+            <p id="message-text" class="text-gray-700 text-lg mb-8 transition-opacity duration-500">
+                Anh biết anh đã làm em buồn, xin em cho anh một cơ hội để bù đắp.
+            </p>
+
+            <div class="relative flex justify-center items-center h-24">
+                <!-- Nút YES -->
+                <button 
+                    id="btn-yes" 
+                    onclick="handleYes()" 
+                    class="btn-yes bg-pink-500 hover:bg-pink-700 text-white font-bold py-3 px-8 rounded-full text-xl z-10 transition duration-300 transform hover:scale-105"
+                >
+                    Đồng ý (Em tha thứ cho anh)
+                </button>
+
+                <!-- Nút NO - Có hiệu ứng di chuyển -->
+                <button 
+                    id="btn-no" 
+                    onmouseover="moveNoButton()" 
+                    onclick="handleNo()"
+                    class="btn-no bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-full text-sm ml-8"
+                >
+                    Từ chối (No)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lấy tham chiếu đến các phần tử
+        const btnNo = document.getElementById('btn-no');
+        const contentCard = document.getElementById('content-card');
+        const messageText = document.getElementById('message-text');
+        
+        let noClickCount = 0;
+        const noMessages = [
+            "Anh biết là em còn giận lắm, nhưng nhấn lại xem...",
+            "Đừng mà em, anh biết lỗi rồi thật rồi 🥺",
+            "Nút 'Từ chối' này hình như bị lỗi rồi. Thử lại nút 'Đồng ý' đi em!",
+            "Anh sẽ làm mọi thứ để em cười. Cho anh cơ hội nhé?",
+            "Thử nhấn 'Đồng ý' đi, anh hứa là có món quà nhỏ đấy 😉",
+            "Em nỡ làm anh buồn thật sao? T__T",
+            "Em không thể thoát khỏi nút 'Đồng ý' được đâu, vì anh yêu em!"
+        ];
+
+        // --- Hàm xử lý Modal (Thông báo tùy chỉnh) ---
+
+        function showModal(title, message, isSuccess = false) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            
+            const titleElement = document.getElementById('modal-title');
+            const buttonElement = document.querySelector('#custom-modal button');
+            
+            if (isSuccess) {
+                titleElement.classList.remove('text-red-500');
+                titleElement.classList.add('text-green-600');
+                buttonElement.classList.remove('bg-red-500', 'hover:bg-red-600');
+                buttonElement.classList.add('bg-green-500', 'hover:bg-green-600');
+            } else {
+                titleElement.classList.remove('text-green-600');
+                titleElement.classList.add('text-red-500');
+                buttonElement.classList.remove('bg-green-500', 'hover:bg-green-600');
+                buttonElement.classList.add('bg-red-500', 'hover:bg-red-600');
+            }
+            
+            document.getElementById('custom-modal').classList.remove('hidden');
+            document.getElementById('custom-modal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+            document.getElementById('custom-modal').classList.remove('flex');
+        }
+
+        // --- Xử lý sự kiện click/touch cho nút NO ---
+
+        function handleNo() {
+            // Hiển thị modal thay vì alert
+            showModal('Không thể Từ chối!', 'Anh đã cố gắng hết sức để làm em vui. Đừng nhấp vào nút này nữa mà! 😢', false);
+            
+            // Tăng số lần từ chối và thay đổi tin nhắn
+            noClickCount++;
+            if (noClickCount < noMessages.length) {
+                 messageText.innerText = noMessages[noClickCount];
+            } else {
+                messageText.innerText = "Anh không còn lời nào để nói nữa... Chỉ mong em hiểu lòng anh. 😭";
+            }
+            // Gọi hàm di chuyển nút (để đảm bảo cả trên mobile cũng di chuyển)
+            moveNoButton();
+        }
+
+        function moveNoButton() {
+            // Lấy kích thước của thẻ chứa nội dung (contentCard)
+            const bounds = contentCard.getBoundingClientRect();
+            const cardWidth = bounds.width;
+            const cardHeight = 100; // Chiều cao cố định của vùng nút
+
+            // Lấy kích thước hiện tại của nút NO
+            const btnWidth = btnNo.offsetWidth;
+            const btnHeight = btnNo.offsetHeight;
+
+            // Tính toán vị trí ngẫu nhiên mới (trong phạm vi của card)
+            let newX, newY;
+
+            // Đảm bảo nút NO không chồng lên nút YES (nút YES nằm giữa X=0)
+            // Giới hạn dịch chuyển ngẫu nhiên
+            
+            // X ngẫu nhiên: tránh khu vực chính giữa (khoảng 200px)
+            do {
+                newX = Math.random() * (cardWidth - btnWidth) - (cardWidth / 2) + btnWidth / 2;
+            } while (Math.abs(newX) < 150); // Khoảng cách tối thiểu 150px từ trung tâm
+
+            // Y ngẫu nhiên: trong vùng nút (chiều cao 100px)
+            newY = Math.random() * (cardHeight - btnHeight) - (cardHeight / 2) + btnHeight / 2;
+
+            // Áp dụng vị trí mới bằng transform (di chuyển)
+            // Tăng thêm scale ngẫu nhiên để nút trông "hoảng hốt" hơn
+            btnNo.style.transform = `translate(${newX}px, ${newY}px) scale(${1 + Math.random() * 0.3})`;
+            
+            // Thay đổi kích thước font ngẫu nhiên
+            btnNo.style.fontSize = `${10 + Math.random() * 6}px`; 
+        }
+
+        // Thêm sự kiện touch (chạm) cho thiết bị di động
+        btnNo.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Ngăn cuộn trang
+            handleNo();
+        });
+
+        // --- Xử lý sự kiện cho nút YES ---
+        
+        function handleYes() {
+            const body = document.body;
+            const contentCard = document.getElementById('content-card');
+
+            // 1. Thay đổi background lãng mạn hơn
+            body.style.background = 'linear-gradient(135deg, #FF69B4 0%, #FFC0CB 100%)'; // Hồng đậm
+            contentCard.classList.remove('shadow-2xl');
+            contentCard.classList.add('shadow-3xl', 'ring-4', 'ring-pink-400');
+
+            // 2. Ẩn nút NO và làm nổi bật nút YES
+            btnNo.style.display = 'none';
+            document.getElementById('btn-yes').classList.remove('bg-pink-500', 'hover:bg-pink-700');
+            document.getElementById('btn-yes').classList.add('bg-green-500', 'hover:bg-green-600', 'animate-none');
+            document.getElementById('btn-yes').innerText = "Tuyệt vời!";
+
+            // 3. Thay đổi nội dung
+            document.getElementById('message-text').innerHTML = `
+                <div class="text-3xl mb-4 text-green-600 font-bold">
+                    Anh Cảm Ơn Em Nhiều Lắm! ❤️
+                </div>
+                <p class="text-xl text-gray-800">
+                    Anh yêu em. Cảm ơn em đã cho anh cơ hội. Anh hứa sẽ không làm em thất vọng nữa!
+                </p>
+                <div class="mt-6 text-4xl animate-pulse">
+                    😘 🥰 😍
+                </div>
+            `;
+            
+            // 4. Hiển thị modal chúc mừng
+            showModal('Thành Công!', 'Lời xin lỗi của anh đã được chấp nhận! Chúc mừng hai bạn đã hòa giải!', true);
+
+            // 5. Ngăn không cho nút YES được bấm lại
+            document.getElementById('btn-yes').onclick = null;
+        }
+
+    </script>
+</body>
+</html>
